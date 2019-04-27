@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 6
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: dither_mat
+  m_Shader: {fileID: 4800000, guid: 45cbbb80e1597714fb1773b303d9d3ab, type: 3}
+  m_ShaderKeywords: 
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: 3000
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs: []
+    m_Floats:
+    - Vector1_8F9930A4: 0.74
+    - Vector1_ACADCD11: 1
+    - Vector1_E9059EE5: 0.5
+    - _DitherSize: 0.25
+    m_Colors:
+    - Vector2_CC1394C8: {r: 0, g: 0, b: 0, a: 0}
+    - _ScreenCordinates: {r: 0, g: 0, b: 0, a: 0}
