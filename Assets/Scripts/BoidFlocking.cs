@@ -6,10 +6,11 @@ public class BoidFlocking : MonoBehaviour
 {
     private GameObject Controller;
     private bool inited = false;
-    private float minVelocity, maxVelocity;
+    [HideInInspector] public float minVelocity, maxVelocity;
     private float randomness;
     private GameObject chasee;
     private Rigidbody rigid;
+    public LayerMask obstacles;
 
     private void Start()
     {
@@ -29,6 +30,14 @@ public class BoidFlocking : MonoBehaviour
             else if (speed < minVelocity) {
                 rigid.velocity = rigid.velocity.normalized * minVelocity;
             }
+
+            RaycastHit hit;
+
+            if (Physics.Raycast(transform.position, rigid.velocity.normalized , out hit, 1, obstacles))
+            {
+                rigid.velocity = Vector3.Cross(hit.normal, Vector3.up) / 3;
+            }
+
             float waitTime = Random.Range(0.01f, 0.005f);
             yield return new WaitForSeconds(waitTime);
         }
@@ -62,8 +71,6 @@ public class BoidFlocking : MonoBehaviour
         while (inited == false) {
             if ((BoidController.instance.transform.position - transform.position).magnitude < 5) {
                 SetController(BoidController.instance.gameObject);
-                inited = true;
-
             }
             yield return new WaitForSeconds(0.2f);
         }
@@ -71,15 +78,26 @@ public class BoidFlocking : MonoBehaviour
 
     public void SetController(GameObject theController)
     {
+        if (inited) {
+            return;
+        }
+        inited = true;
         Controller = theController;
         BoidController boidController = Controller.GetComponent<BoidController>();
-        minVelocity = boidController.minVelocity * Random.Range(0.5f, 1);
-        maxVelocity = boidController.maxVelocity * Random.Range(0.5f, 1);
+        minVelocity = boidController.minVelocity * Random.Range(0.75f, 1);
+        maxVelocity = boidController.maxVelocity * Random.Range(0.75f, 1);
         randomness = boidController.randomness;
         chasee = boidController.chasee;
-
+        boidController.boids.Add(this.gameObject);
         rigid = GetComponent<Rigidbody>();
         StartCoroutine("BoidSteering");
 
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.GetComponent<BoidFlocking>() != null && Controller != null) {
+            collision.gameObject.GetComponent<BoidFlocking>().SetController(Controller);
+        }
     }
 }

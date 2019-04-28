@@ -13,7 +13,7 @@ public class PlayerController : MonoBehaviour
     public float rollTime;
     public float accel = 0.1f;
     Rigidbody rigid;
-
+    public LayerMask obstacles;
 
     // Start is called before the first frame update
     void Start() {
@@ -31,13 +31,31 @@ public class PlayerController : MonoBehaviour
         Vector3 direction = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
         float maxSpeed = speed;
 
-        if (Input.GetKey(KeyCode.Space)) {
-            maxSpeed += chargeSpeed;
+        RaycastHit hit;
+        if (Physics.Raycast(transform.position, direction, out hit, 1, obstacles)) {           
+            direction = Vector3.Cross(hit.normal, Vector3.up) / 3;
         }
 
-        if (rigid.velocity.magnitude < maxSpeed)
+        if (direction.magnitude > 0.1f) {
+            transform.eulerAngles = new Vector3(0, Vector3.SignedAngle(Vector3.right, direction, Vector3.up), 0);
+        }
+
+        if (Input.GetButton("Fire1")) {
+            maxSpeed += chargeSpeed;
+            Vector3 tarDirection = Vector3.Lerp(rigid.velocity.normalized, direction, 0.75f);
+
+            if (rigid.velocity.magnitude < maxSpeed) {
+                rigid.velocity += tarDirection * accel;
+            }
+        } else {
+            if (rigid.velocity.magnitude < maxSpeed) {
+                rigid.velocity += direction * accel;
+            }
+        }
+
+        if (direction.magnitude > 0.1f)
         {
-            rigid.velocity += direction * accel;
+            transform.eulerAngles = new Vector3(0, Vector3.SignedAngle(Vector3.right, rigid.velocity, Vector3.up), 0);
         }
     }
 }

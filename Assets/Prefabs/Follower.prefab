@@ -4851,7 +4851,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
+  - {fileID: 2100000, guid: cabe710686817854ea0b4b4de77e3be9, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -4883,6 +4883,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3bc1fa39a6e8b444e9a1479de26a370a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  minVelocity: 0
+  maxVelocity: 0
+  obstacles:
+    serializedVersion: 2
+    m_Bits: 1
 --- !u!54 &7788846615104324396
 Rigidbody:
   m_ObjectHideFlags: 0
