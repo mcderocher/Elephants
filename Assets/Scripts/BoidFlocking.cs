@@ -98,6 +98,7 @@ public class BoidFlocking : MonoBehaviour
         if (inited) {
             return;
         }
+        transform.parent = null;
         inited = true;
         Controller = theController;
         BoidController boidController = Controller.GetComponent<BoidController>();
@@ -107,6 +108,7 @@ public class BoidFlocking : MonoBehaviour
         chasee = boidController.chasee;
         boidController.boids.Add(this.gameObject);
         rigid = GetComponent<Rigidbody>();
+        rigid.velocity = new Vector3(rigid.velocity.x, 0, rigid.velocity.z);
         StartCoroutine("BoidSteering");
 
     }

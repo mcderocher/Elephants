@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 0051dae968b7e1d45b694e1b0af8fe04
+guid: b911c40a3522c904394bb0a4b2672ce1
 ModelImporter:
   serializedVersion: 25
   internalIDToNameTable: []
@@ -8,7 +8,7 @@ ModelImporter:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: aiStandardSurface1
-    second: {fileID: 2100000, guid: eec4320170f78d644b6d7491d1259248, type: 2}
+    second: {fileID: 2100000, guid: a437fec0af602614b868d6e676cbc6f4, type: 2}
   materials:
     importMaterials: 1
     materialName: 0
@@ -39,7 +39,7 @@ ModelImporter:
     isReadable: 0
   meshes:
     lODScreenPercentages: []
-    globalScale: 1
+    globalScale: 100
     meshCompression: 0
     addColliders: 0
     useSRGBMaterialColor: 1
