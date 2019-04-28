@@ -57,23 +57,40 @@ public class BoidFlocking : MonoBehaviour
         flockVelocity = flockVelocity - rigid.velocity;
         follow = follow - transform.localPosition;
 
-        if (follow.magnitude < 2) {
-            return randomize * randomness;
+
+
+        Rigidbody ControllerRigid = Controller.GetComponent<Rigidbody>();
+        Vector3 dir = flockCenter + flockVelocity + follow * 3;
+        dir += Controller.transform.forward * ControllerRigid.velocity.magnitude * 5;
+        
+
+        if (follow.magnitude < 5)
+        {
+            return Vector3.zero;
+        }
+        transform.eulerAngles = new Vector3(0, Vector3.SignedAngle(Vector3.forward, dir, Vector3.up), 0);
+
+        if (ControllerRigid.velocity.magnitude < 5)
+        {
+            dir += randomize * randomness;
         }
 
-        Vector3 dir = flockCenter + flockVelocity + follow * 10 + randomize * randomness;
-        transform.eulerAngles = new Vector3(0, Vector3.SignedAngle(Vector3.right, follow, Vector3.up), 0);
 
         return flockCenter + flockVelocity + follow * 3 + randomize * randomness;
     }
 
     IEnumerator WaitForPlayer() {
         while (inited == false) {
-            if ((BoidController.instance.transform.position - transform.position).magnitude < 5) {
+            if ((BoidController.instance.transform.position - transform.position).magnitude < 10) {
                 SetController(BoidController.instance.gameObject);
             }
             yield return new WaitForSeconds(0.2f);
         }
+    }
+
+    void Shot() {
+        Controller.GetComponent<BoidController>().boids.Remove(this.gameObject);
+        Destroy(this.gameObject);
     }
 
     public void SetController(GameObject theController)
@@ -84,8 +101,8 @@ public class BoidFlocking : MonoBehaviour
         inited = true;
         Controller = theController;
         BoidController boidController = Controller.GetComponent<BoidController>();
-        minVelocity = boidController.minVelocity * Random.Range(0.75f, 1);
-        maxVelocity = boidController.maxVelocity * Random.Range(0.75f, 1);
+        minVelocity = boidController.minVelocity * Random.Range(0.5f, 1);
+        maxVelocity = boidController.maxVelocity * Random.Range(0.5f, 1);
         randomness = boidController.randomness;
         chasee = boidController.chasee;
         boidController.boids.Add(this.gameObject);

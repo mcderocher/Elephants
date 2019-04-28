@@ -28,7 +28,7 @@ public class BoidController : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    void LateUpdate()
     {
         Vector3 theCenter = Vector3.zero;
         Vector3 theVelocity = Vector3.zero;
@@ -36,6 +36,10 @@ public class BoidController : MonoBehaviour
 
 
         foreach (GameObject boid in boids) {
+            if (boid == null) {
+                continue;
+            }
+
             theCenter = theCenter + boid.transform.localPosition;
             theVelocity = theVelocity + boid.GetComponent<Rigidbody>().velocity;
 
@@ -45,11 +49,11 @@ public class BoidController : MonoBehaviour
                 boid.GetComponent<BoidFlocking>().minVelocity = minVelocity + 10;
             }
             else if (rigid.velocity.magnitude > 1) {
-                boid.GetComponent<BoidFlocking>().maxVelocity = maxVelocity * Random.Range(0.75f, 1);
-                boid.GetComponent<BoidFlocking>().minVelocity = minVelocity * Random.Range(0.75f, 1);
+                boid.GetComponent<BoidFlocking>().maxVelocity = maxVelocity * Random.Range(0.5f, 1);
+                boid.GetComponent<BoidFlocking>().minVelocity = minVelocity * Random.Range(0.5f, 1);
             } else {
                 boid.GetComponent<BoidFlocking>().maxVelocity = maxVelocity / 2;
-                boid.GetComponent<BoidFlocking>().minVelocity = minVelocity * Random.Range(0.75f, 1);
+                boid.GetComponent<BoidFlocking>().minVelocity = minVelocity * Random.Range(0.5f, 1);
             }
         }
 

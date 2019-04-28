@@ -21,10 +21,18 @@ public class PoacherBehavior : MonoBehaviour
 
     public float activateDistance;
     public LayerMask obstacles;
+    public LayerMask hittable;
+
+    private LineRenderer lr;
+
+    // this is pretty lazy but yeah
+    public GameObject standing;
+    public GameObject aiming;
 
     // Start is called before the first frame update
     void Start()
     {
+        lr = GetComponent<LineRenderer>();
         herd = BoidController.instance;
         nav = GetComponent<NavMeshAgent>();
         idle = new TreeNode(IsPlayerCloseEnough, test, test2, null);
@@ -52,6 +60,8 @@ public class PoacherBehavior : MonoBehaviour
     {
         while (true)
         {
+            standing.SetActive(true);
+            aiming.SetActive(false);
             Debug.DrawRay(herd.flockCenter, Vector3.up * activateDistance);
             print("hoi");
             if ((herd.flockCenter - transform.position).magnitude < activateDistance)
@@ -65,6 +75,7 @@ public class PoacherBehavior : MonoBehaviour
 
     IEnumerator IsPlayerInRange(Action<BTEvaluationResult> callback) {
         while (true) {
+            nodes.Remove(idle);
             //keep running
             if (!nav.pathPending) {
                 yield return StartCoroutine(MoveToPoint(herd.flockCenter));
@@ -78,8 +89,6 @@ public class PoacherBehavior : MonoBehaviour
                 yield return null;
                 continue;
             }
-
-            print("I'm done");
             callback(BTEvaluationResult.Success);
             yield break;
         }
@@ -88,24 +97,39 @@ public class PoacherBehavior : MonoBehaviour
    
     IEnumerator IsPlayerShootable(Action<BTEvaluationResult> callback)
     {
+        IEnumerator lookAt = LookAtConstant(herd);
+        StartCoroutine(lookAt);
         while (true)  {
+            standing.SetActive(false);
+            aiming.SetActive(true);
+            float distFromTarget = (herd.flockCenter - transform.position).magnitude;
+            bool directLOS = Physics.Linecast(transform.position, herd.flockCenter, obstacles);
 
-        float distFromTarget = (herd.flockCenter - transform.position).magnitude;
-        bool directLOS = Physics.Linecast(transform.position, herd.flockCenter, obstacles);
+            // Shoot at nearest player
+            yield return new WaitForSeconds(UnityEngine.Random.Range(2, 4));
 
-        // Shoot at nearest player
-        yield return new WaitForSeconds(1);
-        StartCoroutine(LookAtPoint(herd.flockCenter));
-
+            fireGun();
+            
             if (distFromTarget < nav.stoppingDistance + 10 && !directLOS) {
-        callback(BTEvaluationResult.Continue);
-        yield return null;
-        continue;
+                callback(BTEvaluationResult.Continue);
+                yield return null;
+                continue;
+            }
+            StopCoroutine(lookAt);
+            callback(BTEvaluationResult.Failure);
+            yield break;
         }
-        callback(BTEvaluationResult.Failure);
-        yield break;
-    }
 }
+
+    void fireGun() {
+        RaycastHit hit;
+        if (Physics.Raycast(transform.position, transform.forward, out hit, hittable)) {
+            lr.SetPosition(0, transform.position);
+            lr.SetPosition(1, hit.point);
+            lr.SetWidth(0.3f, 0.3f);
+            hit.transform.SendMessage("Shot", SendMessageOptions.DontRequireReceiver);
+        } 
+    }
 
     IEnumerator test() {
         yield return null;
@@ -134,4 +158,25 @@ public class PoacherBehavior : MonoBehaviour
         }
     }
 
+    IEnumerator LookAtConstant(BoidController herd)
+    {
+        while (true) {
+            Vector3 lookDir = herd.flockCenter - transform.position;
+            lookDir.y = 0;
+            Debug.DrawRay(herd.flockCenter, Vector3.up * activateDistance);
+            Quaternion toRot = Quaternion.LookRotation(lookDir, Vector3.up);
+            transform.rotation = toRot;
+            yield return null;
+        }
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.GetComponent<BoidFlocking>() != null)
+        {
+            StopAllCoroutines();
+            nav.enabled = false;
+            this.enabled = false;
+        }
+    }
 }
