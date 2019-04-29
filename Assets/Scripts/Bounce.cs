@@ -20,7 +20,7 @@ public class Bounce : MonoBehaviour
     {
         Vector3 vel = rigid.velocity;
         vel.y = 0;
-        if (Physics.Raycast(transform.position, Vector3.down, 0.6f) && vel.magnitude > 3) {
+        if (Physics.Raycast(transform.position, Vector3.down, 0.6f, ground) && vel.magnitude > 1) {
             rigid.velocity += Vector3.up * Random.Range(minBounce, maxBounce);
         }
     }

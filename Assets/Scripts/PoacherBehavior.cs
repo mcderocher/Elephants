@@ -24,6 +24,7 @@ public class PoacherBehavior : MonoBehaviour
     public LayerMask hittable;
 
     private LineRenderer lr;
+    public LineRenderer aimingLR;
 
     // this is pretty lazy but yeah
     public GameObject standing;
@@ -32,6 +33,7 @@ public class PoacherBehavior : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        aimingLR.gameObject.SetActive(false);
         lr = GetComponent<LineRenderer>();
         herd = BoidController.instance;
         nav = GetComponent<NavMeshAgent>();
@@ -63,7 +65,6 @@ public class PoacherBehavior : MonoBehaviour
             standing.SetActive(true);
             aiming.SetActive(false);
             Debug.DrawRay(herd.flockCenter, Vector3.up * activateDistance);
-            print("hoi");
             if ((herd.flockCenter - transform.position).magnitude < activateDistance)
             {
                 callback(BTEvaluationResult.Success);
@@ -75,6 +76,7 @@ public class PoacherBehavior : MonoBehaviour
 
     IEnumerator IsPlayerInRange(Action<BTEvaluationResult> callback) {
         while (true) {
+            aimingLR.gameObject.SetActive(false);
             nodes.Remove(idle);
             //keep running
             if (!nav.pathPending) {
@@ -97,16 +99,20 @@ public class PoacherBehavior : MonoBehaviour
    
     IEnumerator IsPlayerShootable(Action<BTEvaluationResult> callback)
     {
+        aimingLR.gameObject.SetActive(true);
         IEnumerator lookAt = LookAtConstant(herd);
         StartCoroutine(lookAt);
         while (true)  {
+            if (this.enabled == false) {
+                break;
+            }
             standing.SetActive(false);
             aiming.SetActive(true);
             float distFromTarget = (herd.flockCenter - transform.position).magnitude;
             bool directLOS = Physics.Linecast(transform.position, herd.flockCenter, obstacles);
 
             // Shoot at nearest player
-            yield return new WaitForSeconds(UnityEngine.Random.Range(2, 4));
+            yield return new WaitForSeconds(UnityEngine.Random.Range(4, 8));
 
             fireGun();
             
@@ -123,7 +129,9 @@ public class PoacherBehavior : MonoBehaviour
 
     void fireGun() {
         RaycastHit hit;
-        if (Physics.Raycast(transform.position, transform.forward, out hit, hittable)) {
+        Vector3 aim = transform.forward + transform.right * UnityEngine.Random.RandomRange(-0.2f, 0.2f);
+
+        if (Physics.Raycast(transform.position, aim, out hit, hittable)) {
             lr.SetPosition(0, transform.position);
             lr.SetPosition(1, hit.point);
             lr.SetWidth(0.3f, 0.3f);
@@ -163,7 +171,6 @@ public class PoacherBehavior : MonoBehaviour
         while (true) {
             Vector3 lookDir = herd.flockCenter - transform.position;
             lookDir.y = 0;
-            Debug.DrawRay(herd.flockCenter, Vector3.up * activateDistance);
             Quaternion toRot = Quaternion.LookRotation(lookDir, Vector3.up);
             transform.rotation = toRot;
             yield return null;
@@ -175,6 +182,7 @@ public class PoacherBehavior : MonoBehaviour
         if (collision.gameObject.GetComponent<BoidFlocking>() != null)
         {
             StopAllCoroutines();
+            aimingLR.gameObject.SetActive(false);
             nav.enabled = false;
             this.enabled = false;
         }

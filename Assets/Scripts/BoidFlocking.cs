@@ -76,7 +76,7 @@ public class BoidFlocking : MonoBehaviour
         }
 
 
-        return flockCenter + flockVelocity + follow * 3 + randomize * randomness;
+        return flockCenter + flockVelocity + follow * 10 + randomize * randomness;
     }
 
     IEnumerator WaitForPlayer() {

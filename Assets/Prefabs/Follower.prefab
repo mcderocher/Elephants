@@ -4950,7 +4950,7 @@ MonoBehaviour:
   ground:
     serializedVersion: 2
     m_Bits: 1
-  minBounce: 2
+  minBounce: 1
   maxBounce: 10
 --- !u!114 &644302558915266491
 MonoBehaviour:

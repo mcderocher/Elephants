@@ -59,5 +59,16 @@ public class BoidController : MonoBehaviour
 
         flockCenter = theCenter / (boids.Count);
         flockVelocity = theVelocity / (boids.Count);
+
+        if (boids.Count == 0) {
+            StartCoroutine("restart");
+        }
+    }
+
+    IEnumerable restart() {
+        TransitionController.instance.fadeIn();
+        yield return new WaitForSeconds(1);
+        Application.LoadLevel(Application.loadedLevel);
+
     }
 }
